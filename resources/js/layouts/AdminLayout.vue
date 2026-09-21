@@ -14,6 +14,7 @@ const nav = [
     { group: 'সাধারণ' },
     { to: '/admin', label: 'ড্যাশবোর্ড', icon: '▦', exact: true },
     { group: 'ওয়েবসাইট' },
+    { to: '/admin/home', label: 'হোমপেজ ও টেমপ্লেট', icon: '⌂', permission: 'pages.manage' },
     { to: '/admin/notices', label: 'নোটিশ', icon: '✉', permission: 'notices.manage' },
     { to: '/admin/notice-categories', label: 'নোটিশ ক্যাটাগরি', icon: '☰', permission: 'notices.manage' },
     { to: '/admin/pages', label: 'পেজ', icon: '▤', permission: 'pages.manage' },

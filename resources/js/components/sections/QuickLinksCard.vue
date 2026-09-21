@@ -9,7 +9,7 @@ const openNoticePopup = inject('openNoticePopup', null);
 <template>
     <div class="card" style="padding: 18px">
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px">
-            <span class="eyebrow">গুরুত্বপূর্ণ লিংক</span>
+            <span class="eyebrow">{{ site.settings.quick_links_title }}</span>
             <span class="spacer" />
             <button v-if="openNoticePopup && site.notices.length" type="button" class="pill-btn" @click="openNoticePopup">নোটিশ পপআপ</button>
         </div>

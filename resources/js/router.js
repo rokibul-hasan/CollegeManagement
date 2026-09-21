@@ -31,6 +31,7 @@ const routes = [
         meta: { requiresAdmin: true },
         children: [
             { path: '', name: 'admin.dashboard', ...page('ড্যাশবোর্ড', () => import('@/pages/admin/DashboardPage.vue')) },
+            { path: 'home', name: 'admin.home', ...guarded('pages.manage', 'হোমপেজ ও টেমপ্লেট', () => import('@/pages/admin/HomeLayoutPage.vue')) },
             { path: 'notices', name: 'admin.notices', ...guarded('notices.manage', 'নোটিশ', () => import('@/pages/admin/NoticesPage.vue')) },
             { path: 'notices/create', name: 'admin.notices.create', ...guarded('notices.manage', 'নতুন নোটিশ', () => import('@/pages/admin/NoticeFormPage.vue')) },
             { path: 'notices/:id(\\d+)/edit', name: 'admin.notices.edit', ...guarded('notices.manage', 'নোটিশ সম্পাদনা', () => import('@/pages/admin/NoticeFormPage.vue')) },

@@ -6,22 +6,32 @@ import { toast } from '@/stores/toast';
 
 const LOCATION_HELP = {
     main: 'হেডারের প্রধান মেনু। কোনো আইটেমের নিচে সাব-মেনু যোগ করলে সেটি ড্রপডাউন হিসেবে দেখাবে।',
+    topbar: 'একদম উপরের সরু বারের ডান পাশের ছোট লিংক। সেটিংস থেকে টপ বার বন্ধ থাকলে দেখাবে না।',
+    header: 'লোগোর ডান পাশের বাটনগুলো। প্রতিটির জন্য আলাদা বাটনের ধরন বেছে নেওয়া যায়। মোবাইলে এগুলো লুকানো থাকে।',
     footer: 'প্রতিটি মূল আইটেম ফুটারের একটি কলামের শিরোনাম; তার সাব-আইটেমগুলো কলামের লিংক।',
     quick: 'হোমপেজের "গুরুত্বপূর্ণ লিংক" বক্স ও ভেতরের পাতার সাইডবারে দেখাবে।',
 };
 
 const location = ref('main');
 const locations = ref({});
+const styles = ref({});
 const menus = ref([]);
 const errors = ref({});
 const editing = ref(null);
-const form = reactive({ label: '', url: '', parent_id: '', open_in_new_tab: false, is_active: true });
+const form = reactive({ label: '', url: '', style: 'soft', parent_id: '', open_in_new_tab: false, is_active: true });
 
 const parentOptions = computed(() => menus.value.filter((menu) => menu.id !== editing.value?.id));
+
+// Only the header renders its items as buttons, so the look is picked there.
+const showsStyle = computed(() => location.value === 'header');
+
+// The top bar and header buttons are single rows of links, so they have no sub-menus.
+const isFlat = computed(() => ['topbar', 'header'].includes(location.value));
 
 async function fetchMenus() {
     const { data } = await api.get('/admin/menus', { params: { location: location.value } });
     locations.value = data.locations;
+    styles.value = data.styles;
     menus.value = data.menus;
 }
 
@@ -35,8 +45,8 @@ function openForm(menu = null, parentId = '') {
     errors.value = {};
     editing.value = menu ?? { id: null };
     Object.assign(form, menu
-        ? { label: menu.label, url: menu.url ?? '', parent_id: menu.parent_id ?? '', open_in_new_tab: menu.open_in_new_tab, is_active: menu.is_active }
-        : { label: '', url: '', parent_id: parentId, open_in_new_tab: false, is_active: true });
+        ? { label: menu.label, url: menu.url ?? '', style: menu.style ?? 'soft', parent_id: menu.parent_id ?? '', open_in_new_tab: menu.open_in_new_tab, is_active: menu.is_active }
+        : { label: '', url: '', style: 'soft', parent_id: parentId, open_in_new_tab: false, is_active: true });
 }
 
 function closeForm() {
@@ -45,7 +55,13 @@ function closeForm() {
 
 async function save() {
     errors.value = {};
-    const payload = { ...form, location: location.value, parent_id: form.parent_id || null, url: form.url || null };
+    const payload = {
+        ...form,
+        location: location.value,
+        parent_id: form.parent_id || null,
+        url: form.url || null,
+        style: showsStyle.value ? form.style : null,
+    };
 
     try {
         if (editing.value.id) {
@@ -135,7 +151,7 @@ onMounted(fetchMenus);
                                 <span class="url">{{ menu.url || '— লিংক নেই —' }}</span>
                             </div>
                             <div class="actions" style="display: flex; gap: 6px">
-                                <button type="button" class="btn btn-soft btn-sm" title="সাব-মেনু যোগ" @click="openForm(null, menu.id)">+ সাব</button>
+                                <button v-if="!isFlat" type="button" class="btn btn-soft btn-sm" title="সাব-মেনু যোগ" @click="openForm(null, menu.id)">+ সাব</button>
                                 <button type="button" class="btn btn-soft btn-sm" @click="openForm(menu)">সম্পাদনা</button>
                                 <button type="button" class="btn btn-danger btn-sm" @click="remove(menu)">মুছুন</button>
                             </div>
@@ -174,7 +190,14 @@ onMounted(fetchMenus);
                     <span class="hint">সাইটের পাতা: /about, /teachers, /notices?category=exam · বাইরের সাইট: https://…</span>
                     <span v-if="errors.url" class="error">{{ errors.url }}</span>
                 </div>
-                <div class="field">
+                <div v-if="showsStyle" class="field">
+                    <label for="menu-style">বাটনের ধরন</label>
+                    <select id="menu-style" v-model="form.style" class="input">
+                        <option v-for="(text, value) in styles" :key="value" :value="value">{{ text }}</option>
+                    </select>
+                    <span v-if="errors.style" class="error">{{ errors.style }}</span>
+                </div>
+                <div v-if="!isFlat" class="field">
                     <label for="menu-parent">মূল মেনু</label>
                     <select id="menu-parent" v-model="form.parent_id" class="input">
                         <option value="">— এটি নিজেই মূল মেনু —</option>

@@ -7,7 +7,7 @@ import { bnDate } from '@/utils/bn';
 <template>
     <aside class="sidebar">
         <div class="card" style="padding: 18px">
-            <div class="eyebrow" style="margin-bottom: 10px">সাম্প্রতিক নোটিশ</div>
+            <div class="eyebrow" style="margin-bottom: 10px">{{ site.settings.recent_notices_title }}</div>
             <router-link
                 v-for="notice in site.notices.slice(0, 5)"
                 :key="notice.id"

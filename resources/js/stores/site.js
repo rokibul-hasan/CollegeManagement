@@ -1,13 +1,19 @@
 import { reactive } from 'vue';
 import api from '@/api';
 
-const DEFAULT_LOGO = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-JJJnOXZkedUfTX2Q2QRN8sJuMWdGbsEPKlT5TRpBbXmeSMBEB8lqckk0&s=10';
+// Shown until a logo is uploaded in the admin; inline so the site never depends on a remote image.
+const DEFAULT_LOGO = 'data:image/svg+xml;utf8,'.concat(encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+    + '<circle cx="32" cy="32" r="32" fill="#12355b"/>'
+    + '<path d="M32 18 12 27l20 9 20-9-20-9Zm-12 15v9c0 3.3 5.4 6 12 6s12-2.7 12-6v-9l-12 5.4L20 33Z" fill="#e9c877"/>'
+    + '</svg>',
+));
 
 export const site = reactive({
     loaded: false,
     failed: false,
     settings: {},
-    menus: { main: [], footer: [], quick: [] },
+    menus: { main: [], topbar: [], header: [], footer: [], quick: [] },
     noticeCategories: [],
     notices: [],
     noticeTotal: 0,

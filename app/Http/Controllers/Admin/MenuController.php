@@ -21,6 +21,7 @@ class MenuController extends Controller
 
         return response()->json([
             'locations' => Menu::LOCATIONS,
+            'styles' => Menu::STYLES,
             'menus' => Menu::query()
                 ->where('location', $location)
                 ->whereNull('parent_id')

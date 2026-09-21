@@ -3,7 +3,6 @@ import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import SmartLink from './SmartLink.vue';
 import { site } from '@/stores/site';
-import { bnDigits } from '@/utils/bn';
 
 const route = useRoute();
 const navOpen = ref(false);
@@ -32,6 +31,13 @@ function toggleDropdown(id) {
     openDropdown.value = openDropdown.value === id ? null : id;
 }
 
+/**
+ * Header buttons carry a style from the admin; the "-live" suffix adds the blinking dot.
+ */
+function buttonClass(item) {
+    return `btn btn-${(item.style || 'soft').replace('-live', '')}`;
+}
+
 function onParentClick(event, item) {
     if (!item.url) {
         event.preventDefault();
@@ -55,11 +61,16 @@ function onParentClick(event, item) {
             </router-link>
             <span class="spacer" />
             <div class="header-actions">
-                <router-link to="/notices" class="btn btn-soft">
-                    <span class="dot dot-blink" />
-                    নোটিশ
-                </router-link>
-                <router-link to="/admission-fee" class="btn btn-primary">ভর্তি তথ্য</router-link>
+                <SmartLink
+                    v-for="item in site.menus.header"
+                    :key="item.id"
+                    :to="item.url || '#'"
+                    :new-tab="item.newTab"
+                    :class="buttonClass(item)"
+                >
+                    <span v-if="(item.style || '').endsWith('-live')" class="dot dot-blink" />
+                    {{ item.label }}
+                </SmartLink>
                 <button type="button" class="nav-toggle" :aria-expanded="navOpen" aria-label="মেনু" @click="navOpen = !navOpen">
                     {{ navOpen ? '×' : '☰' }}
                 </button>
@@ -88,7 +99,7 @@ function onParentClick(event, item) {
                         <div v-if="openDropdown === item.id" class="nav-dropdown">
                             <SmartLink v-for="child in item.children" :key="child.id" :to="child.url || '#'" :new-tab="child.newTab">
                                 <span>{{ child.label }}</span>
-                                <span v-if="child.count !== null" class="count">{{ bnDigits(String(child.count).padStart(2, '0')) }}</span>
+                                <span class="nav-arrow" aria-hidden="true">→</span>
                             </SmartLink>
                         </div>
                     </div>

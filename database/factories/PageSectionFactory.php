@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Page;
 use App\Models\PageSection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,7 +19,13 @@ class PageSectionFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'page_id' => Page::factory(),
+            'type' => 'text',
+            'width' => 'full',
+            'anchor' => null,
+            'data' => ['heading' => fake()->sentence(3), 'body' => fake()->paragraph()],
+            'is_active' => true,
+            'sort_order' => fake()->numberBetween(1, 20),
         ];
     }
 }

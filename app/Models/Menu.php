@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['location', 'parent_id', 'label', 'url', 'open_in_new_tab', 'is_active', 'sort_order'])]
+#[Fillable(['location', 'parent_id', 'label', 'url', 'style', 'open_in_new_tab', 'is_active', 'sort_order'])]
 class Menu extends Model
 {
     /** @use HasFactory<MenuFactory> */
@@ -23,8 +23,22 @@ class Menu extends Model
      */
     public const LOCATIONS = [
         'main' => 'প্রধান মেনু',
+        'topbar' => 'টপ বার',
+        'header' => 'হেডারের বাটন',
         'footer' => 'ফুটার',
         'quick' => 'গুরুত্বপূর্ণ লিংক',
+    ];
+
+    /**
+     * Button looks available to header menu items. The "-live" variant adds the blinking dot.
+     *
+     * @var array<string, string>
+     */
+    public const STYLES = [
+        'soft' => 'হালকা বাটন',
+        'soft-live' => 'হালকা বাটন + জ্বলজ্বলে ডট',
+        'primary' => 'রঙিন বাটন',
+        'gold' => 'সোনালি বাটন',
     ];
 
     /**

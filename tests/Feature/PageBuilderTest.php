@@ -96,6 +96,39 @@ class PageBuilderTest extends TestCase
         ]))->assertJsonValidationErrors('sections.0.type');
     }
 
+    public function test_widget_sections_carry_their_own_labels_and_target_link(): void
+    {
+        $admin = User::factory()->withRole('admin')->create();
+
+        $this->actingAs($admin)->postJson('/api/admin/pages', $this->payload([
+            'sections' => [[
+                'type' => 'widget', 'width' => 'full', 'is_active' => true,
+                'data' => [
+                    'widget' => 'result_form',
+                    'heading' => 'এইচএসসি ফলাফল',
+                    'button_label' => 'দেখুন',
+                    'action_url' => 'https://educationboardresults.gov.bd/',
+                ],
+            ]],
+        ]))->assertCreated();
+
+        $this->getJson('/api/pages/library')
+            ->assertJsonPath('sections.0.data.heading', 'এইচএসসি ফলাফল')
+            ->assertJsonPath('sections.0.data.action_url', 'https://educationboardresults.gov.bd/');
+    }
+
+    public function test_a_widget_target_link_must_be_safe(): void
+    {
+        $admin = User::factory()->withRole('admin')->create();
+
+        $this->actingAs($admin)->postJson('/api/admin/pages', $this->payload([
+            'sections' => [[
+                'type' => 'widget', 'width' => 'full', 'is_active' => true,
+                'data' => ['widget' => 'result_form', 'action_url' => 'javascript:alert(1)'],
+            ]],
+        ]))->assertJsonValidationErrors('sections.0.data');
+    }
+
     public function test_editors_without_page_permission_are_blocked(): void
     {
         $editor = User::factory()->withRole('editor')->create();

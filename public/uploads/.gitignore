@@ -1,0 +1,7 @@
+# Media uploaded through the admin (logo/, pages/) stays on the server;
+# only the campus photos and staff portraits imported from the college's own
+# files ship with the repository.
+/*
+!/.gitignore
+!/campus/
+!/staff/

@@ -16,6 +16,8 @@ const rows = computed(() => (props.data.rows || []).map((row) => ({
     link: safeUrl(row.link_url) ? { url: safeUrl(row.link_url), label: row.link_label || 'দেখুন' } : null,
 })));
 
+const moreUrl = computed(() => (props.data.more_label ? safeUrl(props.data.more_url) : ''));
+
 const columnCount = computed(() => Math.max(
     headers.value.length,
     ...rows.value.map((row) => row.cells.length + (row.link ? 1 : 0)),
@@ -35,6 +37,9 @@ const columnCount = computed(() => Math.max(
             </span>
         </div>
         <p v-if="data.note" class="placeholder-note" style="margin: 16px 0 0">{{ data.note }}</p>
+        <SmartLink v-if="moreUrl" :to="moreUrl" :new-tab="/^https?:/i.test(moreUrl)" class="more-link" style="display: inline-block; margin-top: 18px">
+            {{ data.more_label }} →
+        </SmartLink>
     </div>
 
     <div v-else>
@@ -63,5 +68,8 @@ const columnCount = computed(() => Math.max(
             </div>
         </div>
         <p v-if="data.note" class="placeholder-note" style="margin: 12px 0 0">{{ data.note }}</p>
+        <SmartLink v-if="moreUrl" :to="moreUrl" :new-tab="/^https?:/i.test(moreUrl)" class="more-link" style="display: inline-block; margin-top: 14px">
+            {{ data.more_label }} →
+        </SmartLink>
     </div>
 </template>

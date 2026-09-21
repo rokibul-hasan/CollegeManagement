@@ -17,6 +17,8 @@ class PageController extends Controller
     {
         $canPreview = $request->boolean('preview') && $request->user()?->can('pages.manage');
 
+        abort_if($slug === Page::HOME_SLUG, 404);
+
         $page = Page::query()
             ->where('slug', $slug)
             ->unless($canPreview, fn ($query) => $query->where('is_published', true))

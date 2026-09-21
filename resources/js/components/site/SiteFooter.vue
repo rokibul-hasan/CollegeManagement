@@ -1,6 +1,18 @@
 <script setup>
+import { computed } from 'vue';
 import SmartLink from './SmartLink.vue';
 import { site } from '@/stores/site';
+
+const SOCIAL_LABELS = {
+    facebook_url: 'Facebook',
+    youtube_url: 'YouTube',
+    instagram_url: 'Instagram',
+    linkedin_url: 'LinkedIn',
+};
+
+const socials = computed(() => Object.entries(SOCIAL_LABELS)
+    .filter(([key]) => site.settings[key])
+    .map(([key, label]) => ({ key, label, url: site.settings[key] })));
 </script>
 
 <template>
@@ -15,9 +27,8 @@ import { site } from '@/stores/site';
                 <p v-if="site.settings.address">{{ site.settings.address }}</p>
                 <p v-if="site.settings.phone">{{ site.settings.phone }}</p>
                 <p v-if="site.settings.email">{{ site.settings.email }}</p>
-                <div v-if="site.settings.facebook_url || site.settings.youtube_url" class="socials">
-                    <a v-if="site.settings.facebook_url" :href="site.settings.facebook_url" target="_blank" rel="noopener">Facebook</a>
-                    <a v-if="site.settings.youtube_url" :href="site.settings.youtube_url" target="_blank" rel="noopener">YouTube</a>
+                <div v-if="socials.length" class="socials">
+                    <a v-for="social in socials" :key="social.key" :href="social.url" target="_blank" rel="noopener">{{ social.label }}</a>
                 </div>
             </div>
             <div v-for="column in site.menus.footer" :key="column.id" class="footer-col">

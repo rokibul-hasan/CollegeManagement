@@ -1,11 +1,22 @@
 <script setup>
 import { computed, onMounted, provide, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import SiteHeader from '@/components/site/SiteHeader.vue';
+import SmartLink from '@/components/site/SmartLink.vue';
 import SiteFooter from '@/components/site/SiteFooter.vue';
 import NoticePopup from '@/components/site/NoticePopup.vue';
+import VideoPopup from '@/components/site/VideoPopup.vue';
 import { loadSite, site } from '@/stores/site';
 
+const route = useRoute();
 const popup = ref(null);
+const noticePopupOpen = ref(false);
+
+// Page editors can preview another template with ?template=… (the API decides which sections they get).
+const template = computed(() => route.query.template || site.settings.site_template || 'classic');
+
+// Admin template previews load the site in an iframe with ?embed=1; the notice popup would cover them.
+const embedded = computed(() => route.query.embed === '1');
 
 provide('openNoticePopup', () => popup.value?.show());
 
@@ -15,8 +26,9 @@ onMounted(() => loadSite());
 </script>
 
 <template>
-    <div v-if="site.loaded" style="background: var(--bg); color: var(--ink); min-height: 100vh">
-        <NoticePopup ref="popup" />
+    <div v-if="site.loaded" :data-template="template" style="background: var(--bg); color: var(--ink); min-height: 100vh">
+        <NoticePopup v-if="!embedded" ref="popup" @toggle="noticePopupOpen = $event" />
+        <VideoPopup v-if="!embedded" :hold="noticePopupOpen" />
 
         <div v-if="site.settings.show_top_bar === '1'" class="topbar">
             <div class="container">
@@ -30,8 +42,9 @@ onMounted(() => loadSite());
                     <a :href="`mailto:${site.settings.email}`" class="hide-sm">{{ site.settings.email }}</a>
                 </template>
                 <span class="spacer" />
-                <router-link to="/admission-fee">অনলাইন ভর্তি</router-link>
-                <router-link to="/student-login">লগইন</router-link>
+                <SmartLink v-for="link in site.menus.topbar" :key="link.id" :to="link.url || '#'" :new-tab="link.newTab">
+                    {{ link.label }}
+                </SmartLink>
             </div>
         </div>
 
@@ -39,9 +52,11 @@ onMounted(() => loadSite());
 
         <div v-if="tickerText" class="ticker">
             <div class="container">
-                <span class="ticker-label">সর্বশেষ</span>
+                <span v-if="site.settings.ticker_label" class="ticker-label">{{ site.settings.ticker_label }}</span>
                 <div class="ticker-text">{{ tickerText }}</div>
-                <router-link to="/notices" class="ticker-more">দেখুন →</router-link>
+                <SmartLink v-if="site.settings.ticker_link_label" :to="site.settings.ticker_link_url || '/notices'" class="ticker-more">
+                    {{ site.settings.ticker_link_label }}
+                </SmartLink>
             </div>
         </div>
 

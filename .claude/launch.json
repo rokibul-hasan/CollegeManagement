@@ -6,6 +6,12 @@
       "runtimeExecutable": "H:/laragon/bin/php/php-8.5.6-nts-Win32-vs17-x64/php.exe",
       "runtimeArgs": ["artisan", "serve", "--port=8000"],
       "port": 8000
+    },
+    {
+      "name": "college-8010",
+      "runtimeExecutable": "H:/laragon/bin/php/php-8.5.6-nts-Win32-vs17-x64/php.exe",
+      "runtimeArgs": ["artisan", "serve", "--port=8010"],
+      "port": 8010
     }
   ]
 }

@@ -35,6 +35,9 @@ watch([page, sections], () => {
 
 const activeSections = computed(() => sections.value.filter((section) => section.is_active));
 
+// Hero and intro blocks are designed for the home page only.
+const pageSectionTypes = Object.fromEntries(Object.entries(SECTION_TYPES).filter(([, type]) => !type.homeOnly));
+
 function wrap(section) {
     const uid = nextUid++;
     openState[uid] = section.open ?? false;
@@ -229,7 +232,7 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', warnUnsaved));
                 <div v-if="!sections.length" class="empty-state">এখনো কোনো সেকশন নেই। নিচের বাটন দিয়ে যোগ করুন।</div>
 
                 <div v-if="showPicker" class="section-picker">
-                    <button v-for="(type, key) in SECTION_TYPES" :key="key" type="button" class="section-choice" @click="addSection(key)">
+                    <button v-for="(type, key) in pageSectionTypes" :key="key" type="button" class="section-choice" @click="addSection(key)">
                         <span class="section-icon">{{ type.icon }}</span>
                         <b>{{ type.label }}</b>
                         <small>{{ type.description }}</small>

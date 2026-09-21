@@ -16,7 +16,7 @@ class PageController extends Controller
     public function index(): JsonResponse
     {
         return response()->json(
-            Page::query()->withCount('sections')->orderBy('title')->get(),
+            Page::query()->where('slug', '!=', Page::HOME_SLUG)->withCount('sections')->orderBy('title')->get(),
         );
     }
 
@@ -25,6 +25,8 @@ class PageController extends Controller
      */
     public function show(Page $page): JsonResponse
     {
+        $this->ensureNotHome($page);
+
         return response()->json($page->load('sections'));
     }
 
@@ -48,6 +50,8 @@ class PageController extends Controller
      */
     public function update(SavePageRequest $request, Page $page): JsonResponse
     {
+        $this->ensureNotHome($page);
+
         DB::transaction(function () use ($request, $page) {
             $page->update($this->pageAttributes($request));
             $this->syncSections($page, $this->submittedSections($request));
@@ -61,9 +65,19 @@ class PageController extends Controller
      */
     public function destroy(Page $page): JsonResponse
     {
+        $this->ensureNotHome($page);
+
         $page->delete();
 
         return response()->json(['ok' => true]);
+    }
+
+    /**
+     * The home page is managed from the home layout screen, so the page editor must not touch it.
+     */
+    private function ensureNotHome(Page $page): void
+    {
+        abort_if($page->slug === Page::HOME_SLUG, 404);
     }
 
     /**

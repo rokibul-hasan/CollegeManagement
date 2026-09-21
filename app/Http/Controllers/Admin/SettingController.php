@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\SiteTemplate;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSettingsRequest;
 use App\Models\Setting;
@@ -25,7 +26,7 @@ class SettingController extends Controller
     {
         $values = collect($request->validated())->except(['logo', 'remove_logo'])->all();
 
-        foreach (['show_top_bar', 'notice_popup_enabled'] as $flag) {
+        foreach (['show_top_bar', 'notice_popup_enabled', 'video_popup_enabled'] as $flag) {
             $values[$flag] = $request->boolean($flag) ? '1' : '0';
         }
 
@@ -47,12 +48,13 @@ class SettingController extends Controller
     }
 
     /**
-     * @return array<string, string|null>
+     * @return array<string, mixed>
      */
     private function payload(): array
     {
         $settings = Setting::allValues();
         $settings['logo_url'] = $settings['logo'] ? asset('uploads/'.$settings['logo']) : null;
+        $settings['template_options'] = SiteTemplate::options();
 
         return $settings;
     }

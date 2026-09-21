@@ -8,14 +8,14 @@ use Illuminate\Database\Seeder;
 class MenuSeeder extends Seeder
 {
     /**
-     * Seed the main menu, footer columns and quick links from the approved design.
+     * Seed the top bar, main menu, header buttons, footer columns and quick links from the approved design.
      */
     public function run(): void
     {
         Menu::query()->delete();
 
         $this->seedLocation('main', [
-            ['প্রচ্ছদ', '/'],
+            ['হোম', '/'],
             ['প্রতিষ্ঠান সম্পর্কে', '/about'],
             ['শিক্ষক সম্পর্কে', '/teachers'],
             ['বিভাগসমূহ', '/departments'],
@@ -33,6 +33,16 @@ class MenuSeeder extends Seeder
             ['ফলাফল', '/result'],
             ['স্টুডেন্ট লগইন', '/student-login'],
             ['সহশিক্ষা কার্যক্রম', '/co-curricular'],
+        ]);
+
+        $this->seedLocation('topbar', [
+            ['অনলাইন ভর্তি', '/admission-fee'],
+            ['লগইন', '/student-login'],
+        ]);
+
+        $this->seedLocation('header', [
+            ['নোটিশ', '/notices', [], false, 'soft-live'],
+            ['ভর্তি তথ্য', '/admission-fee', [], false, 'primary'],
         ]);
 
         $this->seedLocation('footer', [
@@ -67,7 +77,7 @@ class MenuSeeder extends Seeder
     }
 
     /**
-     * @param  array<int, array{0: string, 1: ?string, 2?: array<int, mixed>, 3?: bool}>  $items
+     * @param  array<int, array{0: string, 1: ?string, 2?: array<int, mixed>, 3?: bool, 4?: string}>  $items
      */
     private function seedLocation(string $location, array $items, ?int $parentId = null): void
     {
@@ -77,6 +87,7 @@ class MenuSeeder extends Seeder
                 'parent_id' => $parentId,
                 'label' => $item[0],
                 'url' => $item[1],
+                'style' => $item[4] ?? null,
                 'open_in_new_tab' => $item[3] ?? false,
                 'sort_order' => $position + 1,
             ]);

@@ -1,28 +1,21 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { site } from '@/stores/site';
 import { bnDate } from '@/utils/bn';
 
-const STORAGE_KEY = 'notice-popup-seen';
+const emit = defineEmits(['toggle']);
+
 const open = ref(false);
 let timer = null;
 
-function alreadySeen() {
-    try {
-        return sessionStorage.getItem(STORAGE_KEY) === '1';
-    } catch {
-        return false;
-    }
-}
+// The layout keeps other floating cards out of the way while this covers the screen.
+watch(open, (value) => emit('toggle', value));
 
+/**
+ * Closing only hides the popup for this page view — a reload brings it back.
+ */
 function close() {
     open.value = false;
-
-    try {
-        sessionStorage.setItem(STORAGE_KEY, '1');
-    } catch {
-        // Storage can be unavailable in private mode; the popup simply shows again.
-    }
 }
 
 function onKeydown(event) {
@@ -34,7 +27,7 @@ function onKeydown(event) {
 onMounted(() => {
     window.addEventListener('keydown', onKeydown);
 
-    if (site.settings.notice_popup_enabled === '1' && site.popupNotices.length && !alreadySeen()) {
+    if (site.settings.notice_popup_enabled === '1' && site.popupNotices.length) {
         timer = setTimeout(() => {
             open.value = true;
         }, 900);
@@ -54,8 +47,8 @@ defineExpose({ show: () => (open.value = true) });
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="popup-title">
             <div class="modal-head">
                 <div>
-                    <div class="kicker">জরুরি বিজ্ঞপ্তি</div>
-                    <div id="popup-title" class="title">সাম্প্রতিক নোটিশ</div>
+                    <div class="kicker">{{ site.settings.notice_popup_kicker }}</div>
+                    <div id="popup-title" class="title">{{ site.settings.notice_popup_title }}</div>
                 </div>
                 <span class="spacer" />
                 <button type="button" class="modal-close" aria-label="বন্ধ করুন" @click="close">×</button>

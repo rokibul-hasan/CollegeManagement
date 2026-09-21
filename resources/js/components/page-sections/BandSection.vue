@@ -4,12 +4,13 @@ import { safeUrl } from '@/utils/html';
 
 defineProps({
     data: { type: Object, required: true },
+    bleed: { type: Boolean, default: false },
 });
 </script>
 
 <template>
-    <div class="admission-band ps-band">
-        <div class="ps-band-inner">
+    <div class="admission-band" :class="{ 'ps-band': !bleed }">
+        <div class="ps-band-inner" :class="{ 'container ps-band-bleed': bleed }">
             <div>
                 <h3 v-if="data.heading">{{ data.heading }}</h3>
                 <p v-if="data.text" style="white-space: pre-line">{{ data.text }}</p>

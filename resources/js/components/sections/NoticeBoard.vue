@@ -11,9 +11,9 @@ const animate = computed(() => site.notices.length > 3);
 <template>
     <div id="notice" class="notice-board">
         <div class="notice-board-head">
-            <span class="title">নোটিশ বোর্ড</span>
+            <span class="title">{{ site.settings.notice_board_title }}</span>
             <span class="spacer" />
-            <span class="tag">NOTICE</span>
+            <span v-if="site.settings.notice_board_tag" class="tag">{{ site.settings.notice_board_tag }}</span>
         </div>
         <div class="notice-board-body">
             <div :class="{ 'notice-board-track': animate }">
@@ -32,6 +32,6 @@ const animate = computed(() => site.notices.length > 3);
                 <div v-if="!site.notices.length" class="notice-board-empty">এখনো কোনো নোটিশ প্রকাশিত হয়নি।</div>
             </div>
         </div>
-        <router-link to="/notices" class="notice-board-foot">সব নোটিশ দেখুন →</router-link>
+        <router-link to="/notices" class="notice-board-foot">{{ site.settings.notice_board_more_label }}</router-link>
     </div>
 </template>

@@ -34,6 +34,44 @@ class AdminMenuTest extends TestCase
         ])->assertCreated()->assertJsonPath('sort_order', 5);
     }
 
+    public function test_header_buttons_keep_their_style_and_reach_the_public_payload(): void
+    {
+        Menu::query()->whereIn('location', ['topbar', 'header'])->delete();
+
+        $this->actingAs($this->admin)->postJson('/api/admin/menus', [
+            'location' => 'header',
+            'label' => 'ভর্তি তথ্য',
+            'url' => '/admission-fee',
+            'style' => 'primary',
+        ])->assertCreated()->assertJsonPath('style', 'primary');
+
+        Menu::factory()->create(['location' => 'topbar', 'label' => 'লগইন', 'url' => '/student-login']);
+
+        $this->getJson('/api/site')
+            ->assertJsonPath('menus.header.0.style', 'primary')
+            ->assertJsonPath('menus.header.0.label', 'ভর্তি তথ্য')
+            ->assertJsonPath('menus.topbar.0.label', 'লগইন')
+            ->assertJsonPath('menus.topbar.0.style', 'soft');
+    }
+
+    public function test_the_top_bar_and_header_keep_their_previous_links_after_migrating(): void
+    {
+        $this->getJson('/api/site')
+            ->assertJsonPath('menus.topbar.0.url', '/admission-fee')
+            ->assertJsonPath('menus.header.0.style', 'soft-live')
+            ->assertJsonPath('menus.header.1.style', 'primary');
+    }
+
+    public function test_an_unknown_button_style_is_rejected(): void
+    {
+        $this->actingAs($this->admin)->postJson('/api/admin/menus', [
+            'location' => 'header',
+            'label' => 'বাটন',
+            'url' => '/notices',
+            'style' => 'rainbow',
+        ])->assertJsonValidationErrors('style');
+    }
+
     public function test_menu_urls_must_be_safe(): void
     {
         $this->actingAs($this->admin)->postJson('/api/admin/menus', [

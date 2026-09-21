@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('api')->name('api.')->group(function () {
     Route::get('site', [Api\SiteController::class, 'show'])->name('site');
+    Route::get('home', [Api\HomeController::class, 'show'])->name('home');
     Route::get('notices', [Api\NoticeController::class, 'index'])->name('notices.index');
     Route::get('notices/{id}', [Api\NoticeController::class, 'show'])->whereNumber('id')->name('notices.show');
     Route::get('pages/{slug}', [Api\PageController::class, 'show'])->where('slug', '[a-z0-9-]+')->name('pages.show');
@@ -48,8 +49,15 @@ Route::prefix('api')->name('api.')->group(function () {
 
             Route::middleware('permission:pages.manage')->group(function () {
                 Route::apiResource('pages', Admin\PageController::class);
+                Route::get('home', [Admin\HomeLayoutController::class, 'show'])->name('home.show');
+                Route::put('home/{template}', [Admin\HomeLayoutController::class, 'update'])->name('home.update');
+                Route::post('home/{template}/reset', [Admin\HomeLayoutController::class, 'reset'])->name('home.reset');
                 Route::post('media', [Admin\MediaController::class, 'store'])->name('media.store');
             });
+
+            Route::post('home/{template}/default', [Admin\HomeLayoutController::class, 'setDefault'])
+                ->middleware('permission:settings.manage')
+                ->name('home.default');
 
             Route::apiResource('users', Admin\UserController::class)->except('show')->middleware('permission:users.manage');
             Route::apiResource('roles', Admin\RoleController::class)->except('show')->middleware('permission:roles.manage');

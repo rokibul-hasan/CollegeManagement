@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['page_id', 'type', 'width', 'data', 'is_active', 'sort_order'])]
+#[Fillable(['page_id', 'type', 'width', 'anchor', 'data', 'is_active', 'sort_order'])]
 class PageSection extends Model
 {
     /** @use HasFactory<PageSectionFactory> */
@@ -19,7 +20,7 @@ class PageSection extends Model
      *
      * @var array<int, string>
      */
-    public const TYPES = ['text', 'cards', 'people', 'table', 'gallery', 'band', 'html', 'widget'];
+    public const TYPES = ['hero', 'intro', 'text', 'cards', 'people', 'table', 'gallery', 'band', 'html', 'widget'];
 
     /**
      * Built-in dynamic blocks available through the "widget" section.
@@ -48,5 +49,15 @@ class PageSection extends Model
     public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class);
+    }
+
+    /**
+     * Placement of this (home) section in each site template.
+     *
+     * @return HasMany<TemplateSection, $this>
+     */
+    public function templateSections(): HasMany
+    {
+        return $this->hasMany(TemplateSection::class);
     }
 }

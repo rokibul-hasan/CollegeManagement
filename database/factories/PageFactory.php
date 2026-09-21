@@ -18,7 +18,11 @@ class PageFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => fake()->sentence(2),
+            'slug' => fake()->unique()->slug(2),
+            'lead' => fake()->sentence(),
+            'layout' => 'full',
+            'is_published' => true,
         ];
     }
 }

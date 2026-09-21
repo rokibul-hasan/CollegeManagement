@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue';
 import ImageField from './ImageField.vue';
 
 defineOptions({ name: 'SchemaForm' });
@@ -7,6 +8,11 @@ const props = defineProps({
     fields: { type: Array, required: true },
     model: { type: Object, required: true },
 });
+
+/**
+ * Fields may declare showIf(model) to appear only for certain values of another field.
+ */
+const visibleFields = computed(() => props.fields.filter((field) => !field.showIf || field.showIf(props.model)));
 
 function items(field) {
     if (!Array.isArray(props.model[field.key])) {
@@ -36,7 +42,7 @@ function itemTitle(field, item, index) {
 
 <template>
     <div class="schema-form">
-        <div v-for="field in fields" :key="field.key" class="field" :class="{ full: ['textarea', 'code', 'repeater', 'image'].includes(field.type) }">
+        <div v-for="field in visibleFields" :key="field.key" class="field" :class="{ full: ['textarea', 'code', 'repeater', 'image'].includes(field.type) }">
             <span class="label">{{ field.label }}</span>
 
             <input v-if="field.type === 'text'" v-model="model[field.key]" class="input">

@@ -57,6 +57,7 @@ class SiteController extends Controller
             'id' => $menu->id,
             'label' => $menu->label,
             'url' => $menu->url,
+            'style' => $menu->style ?: 'soft',
             'newTab' => $menu->open_in_new_tab,
             'count' => $this->noticeCountFor($menu->url, $countsBySlug),
         ];

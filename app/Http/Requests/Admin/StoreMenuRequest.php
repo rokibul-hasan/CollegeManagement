@@ -35,6 +35,7 @@ class StoreMenuRequest extends FormRequest
             ],
             'label' => ['required', 'string', 'max:120'],
             'url' => ['nullable', 'string', 'max:500', 'regex:/^(\/|#|https?:\/\/|mailto:|tel:)/i'],
+            'style' => ['nullable', Rule::in(array_keys(Menu::STYLES))],
             'open_in_new_tab' => ['boolean'],
             'is_active' => ['boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],

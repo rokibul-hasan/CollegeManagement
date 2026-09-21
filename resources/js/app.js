@@ -1,4 +1,5 @@
 import '../css/app.css';
+import '../css/templates.css';
 import '../css/admin.css';
 
 import { createApp } from 'vue';

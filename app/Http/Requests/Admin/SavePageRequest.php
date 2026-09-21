@@ -14,6 +14,13 @@ class SavePageRequest extends FormRequest
     private const SAFE_URL = '/^(\/|#|https?:\/\/|mailto:|tel:)/i';
 
     /**
+     * Keys inside section data that hold links and must use a safe scheme.
+     *
+     * @var array<int, string>
+     */
+    private const LINK_KEYS = ['url', 'link_url', 'button_url', 'more_url', 'cta_url', 'action_url'];
+
+    /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
@@ -39,11 +46,23 @@ class SavePageRequest extends FormRequest
             'meta_description' => ['nullable', 'string', 'max:300'],
             'layout' => ['required', Rule::in(['full', 'sidebar'])],
             'is_published' => ['boolean'],
+        ] + self::sectionRules();
+    }
+
+    /**
+     * Rules for a submitted "sections" list, shared with the home layout editor.
+     *
+     * @return array<string, array<mixed>>
+     */
+    public static function sectionRules(): array
+    {
+        return [
             'sections' => ['array', 'max:60'],
             'sections.*.type' => ['required', Rule::in(PageSection::TYPES)],
             'sections.*.width' => ['required', Rule::in(['full', 'half'])],
+            'sections.*.anchor' => ['nullable', 'string', 'max:60', 'regex:/^[a-z0-9]+(-[a-z0-9]+)*$/'],
             'sections.*.is_active' => ['boolean'],
-            'sections.*.data' => ['present', 'array', $this->safeSectionData()],
+            'sections.*.data' => ['present', 'array', self::safeSectionData()],
             'sections.*.data.widget' => ['nullable', Rule::in(PageSection::WIDGETS)],
             'sections.*.data.html' => ['nullable', 'string', 'max:100000'],
         ];
@@ -59,13 +78,23 @@ class SavePageRequest extends FormRequest
         return [
             'slug.regex' => 'স্লাগে শুধু ইংরেজি ছোট হাতের অক্ষর, সংখ্যা ও হাইফেন ব্যবহার করুন।',
             'slug.not_in' => 'এই স্লাগটি সিস্টেমের জন্য সংরক্ষিত, অন্য নাম দিন।',
+        ] + self::sectionMessages();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function sectionMessages(): array
+    {
+        return [
+            'sections.*.anchor.regex' => 'অ্যাংকরে শুধু ইংরেজি ছোট হাতের অক্ষর, সংখ্যা ও হাইফেন ব্যবহার করুন।',
         ];
     }
 
     /**
      * Section data is free-form, so check its size and every link inside it.
      */
-    private function safeSectionData(): Closure
+    private static function safeSectionData(): Closure
     {
         return function (string $attribute, mixed $value, Closure $fail): void {
             if (strlen((string) json_encode($value)) > 200000) {
@@ -75,7 +104,7 @@ class SavePageRequest extends FormRequest
             }
 
             array_walk_recursive($value, function (mixed $item, string|int $key) use ($fail): void {
-                $isLinkField = in_array($key, ['url', 'link_url', 'button_url'], true);
+                $isLinkField = in_array($key, self::LINK_KEYS, true);
 
                 if ($isLinkField && is_string($item) && $item !== '' && ! preg_match(self::SAFE_URL, $item)) {
                     $fail('লিংক অবশ্যই /, #, http://, https://, mailto: অথবা tel: দিয়ে শুরু হতে হবে।');

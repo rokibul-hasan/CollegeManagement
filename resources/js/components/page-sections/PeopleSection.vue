@@ -12,7 +12,7 @@ function initial(name) {
 
 <template>
     <div>
-        <SectionHeading :heading="data.heading" :lead="data.lead" />
+        <SectionHeading :heading="data.heading" :lead="data.lead" :more-label="data.more_label" :more-url="data.more_url" />
 
         <div v-if="data.style === 'message'" style="display: grid; gap: 18px">
             <div v-for="(person, index) in data.items || []" :key="index" class="message-card" style="padding: 24px">
@@ -31,9 +31,9 @@ function initial(name) {
         <div v-else class="grid grid-auto-190">
             <div v-for="(person, index) in data.items || []" :key="index" class="person-card">
                 <div class="person-photo" :style="person.photo ? { padding: 0 } : null">
-                    <img v-if="person.photo" :src="person.photo" :alt="person.name" style="width: 100%; height: 190px; object-fit: cover" loading="lazy">
+                    <img v-if="person.photo" :src="person.photo" :alt="person.name" style="width: 100%; height: 100%; object-fit: cover" loading="lazy">
                     <template v-else>
-                        <div class="avatar">{{ initial(person.role) }}</div>
+                        <div class="avatar">{{ initial(person.name) }}</div>
                         <div class="placeholder-note">[ ছবি যোগ করুন ]</div>
                     </template>
                 </div>

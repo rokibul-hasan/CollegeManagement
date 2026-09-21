@@ -8,7 +8,7 @@ defineProps({
 
 <template>
     <div>
-        <SectionHeading :heading="data.heading" :lead="data.lead" />
+        <SectionHeading :heading="data.heading" :lead="data.lead" :more-label="data.more_label" :more-url="data.more_url" />
         <div class="gallery-grid">
             <div v-for="(item, index) in (data.items || []).filter((item) => item.image)" :key="index" class="gallery-item">
                 <img :src="item.image" :alt="item.caption || ''" loading="lazy">
